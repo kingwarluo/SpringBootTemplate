@@ -4,6 +4,7 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,6 +21,9 @@ import java.util.Map;
  */
 @Configuration
 public class ShiroConfig {
+
+    @Autowired
+    private ShiroProperties shiroProperties;
 
     // 这是做啥用的
     @Bean
@@ -52,25 +56,12 @@ public class ShiroConfig {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
 
-        Map<String,String> filterChainDefinitionMap = new LinkedHashMap<>();//拦截器, 配置不会被拦截的链接 顺序判断
-        filterChainDefinitionMap.put("/user/login","anon");    //所有匿名用户均可访问到Controller层的该方法下
-        filterChainDefinitionMap.put("/userLogin","anon");
-        filterChainDefinitionMap.put("/image/**","anon");
-        filterChainDefinitionMap.put("/css/**", "anon");
-        filterChainDefinitionMap.put("/fonts/**","anon");
-        filterChainDefinitionMap.put("/js/**","anon");
-        filterChainDefinitionMap.put("/logout","logout");
-        filterChainDefinitionMap.put("/**", "authc");    //authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问
-        //filterChainDefinitionMap.put("/**", "user");   //user表示配置记住我或认证通过可以访问的地址
-
         // 添加自己的过滤器并且取名为jwt
         LinkedHashMap<String, Filter> filterMap = new LinkedHashMap<>();
         filterMap.put("jwt", jwtFilter());
-        shiroFilterFactoryBean.setFilters(filterMap);
-        // 过滤链定义，从上向下顺序执行，一般将放在最为下边
-        filterChainDefinitionMap.put("/**", "jwt");
 
-        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+        shiroFilterFactoryBean.setFilters(filterMap);
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(shiroProperties.getFilterChainDefinitionMap());
         return shiroFilterFactoryBean;
     }
 

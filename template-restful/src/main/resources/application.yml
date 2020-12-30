@@ -12,3 +12,9 @@ mybatis:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 shiro:
+  filterChainDefinitionMap:
+    /user/login: anon
+    /css/**: anon
+    image/**: anon
+    # 过滤链定义，从上向下顺序执行，一般将放在最为下边
+    /**: jwt
