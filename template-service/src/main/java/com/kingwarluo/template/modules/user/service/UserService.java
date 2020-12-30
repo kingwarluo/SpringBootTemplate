@@ -18,4 +18,12 @@ public interface UserService {
      */
     User getUserByNameAndPassword(String name, String password);
 
+    /**
+     * 根据用户名获取用户
+     *
+     * @author jianhua.luo
+     * @date 2020/12/17
+     */
+    User getUserByName(String name);
+
 }

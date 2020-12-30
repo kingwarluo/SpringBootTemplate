@@ -21,4 +21,12 @@ public interface UserDao {
      */
     User getUserByNameAndPassword(@Param("name") String name, @Param("password") String password);
 
+    /**
+     * 根据用户名获取用户
+     *
+     * @author jianhua.luo
+     * @date 2020/12/17
+     */
+    User getUserByName(@Param("name") String name);
+
 }
