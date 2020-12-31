@@ -8,6 +8,7 @@ import org.apache.shiro.util.AntPathMatcher;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.subject.WebSubject;
+import org.apache.shiro.web.util.WebUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,7 +39,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        log.info("JwtFilter-->>>isAccessAllowed-Method:init()");
+        log.info("JwtFilter-->>>isAccessAllowed-Method:{}", WebUtils.toHttp(request).getRequestURI());
         //如果请求头不存在token,则可能是执行登陆操作或是游客状态访问,直接返回true
         if (isLoginAttempt(request, response)) {
             return true;
@@ -63,12 +64,10 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
-        log.info("JwtFilter-->>>isLoginAttempt-Method:init()");
         HttpServletRequest req = (HttpServletRequest) request;
         String[] noLoginUrls = shiroProperties.getNoLoginUrls().split(",");
         for (String noLoginUrl : noLoginUrls) {
             if(antPathMatcher.match(noLoginUrl, req.getRequestURI())){
-                log.info("JwtFilter-->>>isLoginAttempt-Method:返回true");
                 return true;
             }
         }

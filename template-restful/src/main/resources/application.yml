@@ -13,3 +13,6 @@ mybatis:
 
 shiro:
   noLoginUrls: /user/login
+  cachingEnabled: true
+  authenticationCachingEnabled: true
+  authenticationCacheName: authenticationCache

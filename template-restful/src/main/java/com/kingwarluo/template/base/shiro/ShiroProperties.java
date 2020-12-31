@@ -16,4 +16,18 @@ public class ShiroProperties {
      */
     private String noLoginUrls;
 
+    /**
+     * 启用缓存
+     */
+    private boolean cachingEnabled;
+
+    /**
+     * 开启认证缓存
+     */
+    private boolean authenticationCachingEnabled;
+
+    /**
+     * 指定认证缓存的名字
+     */
+    private String authenticationCacheName;
 }

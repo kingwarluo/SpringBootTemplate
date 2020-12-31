@@ -54,4 +54,9 @@ public class UserController {
         return Result.suc(userService.getUserByName(username));
     }
 
+    @RequestMapping("/logout")
+    public Result logout(HttpServletRequest request) {
+        return Result.suc(true);
+    }
+
 }
