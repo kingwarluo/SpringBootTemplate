@@ -2,8 +2,13 @@ package com.kingwarluo.template.base.shiro;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.AntPathMatcher;
+import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.apache.shiro.web.subject.WebSubject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -15,7 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class JwtFilter extends BasicHttpAuthenticationFilter {
 
-    private AntPathMatcher antPathMatcher =new AntPathMatcher();
+    @Autowired
+    private ShiroProperties shiroProperties;
+
+    private SecurityManager securityManager;
+
+    private AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     private static final String HEADER_ACCESS_TOKEN = "Access-Token";
 
@@ -38,8 +48,14 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
             executeLogin(request, response);
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new AuthenticationException("Token失效请重新登录");
         }
+    }
+
+    @Override
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+        return false;
     }
 
     /**
@@ -49,15 +65,14 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
         log.info("JwtFilter-->>>isLoginAttempt-Method:init()");
         HttpServletRequest req = (HttpServletRequest) request;
-        if(antPathMatcher.match("/user/login", req.getRequestURI())){
-            return true;
+        String[] noLoginUrls = shiroProperties.getNoLoginUrls().split(",");
+        for (String noLoginUrl : noLoginUrls) {
+            if(antPathMatcher.match(noLoginUrl, req.getRequestURI())){
+                log.info("JwtFilter-->>>isLoginAttempt-Method:返回true");
+                return true;
+            }
         }
-        String token = req.getHeader(HEADER_ACCESS_TOKEN);
-        if (token == null) {
-            return false;
-        }
-        log.info("JwtFilter-->>>isLoginAttempt-Method:返回true");
-        return true;
+        return false;
     }
 
     /**
@@ -68,10 +83,32 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         log.info("JwtFilter-->>>executeLogin-Method:init()");
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String token = httpServletRequest.getHeader(HEADER_ACCESS_TOKEN);//Access-Token
+        if (token == null) {
+            throw new AuthenticationException();
+        }
         JwtToken jwtToken = new JwtToken(token);
         // 提交给realm进行登入,如果错误他会抛出异常并被捕获, 反之则代表登入成功,返回true
-        getSubject(request, response).login(jwtToken);
+        createSubject(request, response).login(jwtToken);
         return true;
+    }
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    /**
+     * 解决冲突问题
+     * @param request
+     * @param response
+     * @return
+     */
+    protected Subject createSubject(ServletRequest request, ServletResponse response) {
+        Subject subject = ThreadContext.getSubject();
+        if (subject == null || !(subject instanceof WebSubject)) {
+            subject = (new WebSubject.Builder(this.securityManager, request, response)).buildWebSubject();
+            ThreadContext.bind(subject);
+        }
+        return subject;
     }
 
     /**

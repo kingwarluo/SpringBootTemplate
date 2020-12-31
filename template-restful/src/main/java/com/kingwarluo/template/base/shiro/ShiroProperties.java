@@ -11,6 +11,9 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "shiro")
 public class ShiroProperties {
 
-    private Map<String, String> filterChainDefinitionMap;
+    /**
+     * 不需要登录的请求地址，用，隔开
+     */
+    private String noLoginUrls;
 
 }

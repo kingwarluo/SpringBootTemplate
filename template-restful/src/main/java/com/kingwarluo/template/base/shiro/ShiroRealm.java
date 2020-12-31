@@ -56,7 +56,7 @@ public class ShiroRealm extends AuthorizingRealm {
         if (user == null) {
             throw new AuthenticationException("用户不存在!");
         }
-        return new SimpleAuthenticationInfo(user, token, ByteSource.Util.bytes(user.getSalt()), getName());
+        return new SimpleAuthenticationInfo(user, token.getCredentials(), ByteSource.Util.bytes(user.getSalt()), getName());
     }
 
 }

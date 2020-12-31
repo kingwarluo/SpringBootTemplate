@@ -23,6 +23,6 @@ public class JwtToken implements AuthenticationToken {
 
     @Override
     public Object getCredentials() {
-        return null;
+        return token;
     }
 }
