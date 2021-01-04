@@ -2,8 +2,7 @@ import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
-
-axios.defaults.headers['Content-Type'] = 'application/json;charset=UTF-8'
+import qs from 'qs' // 引入qs模块，用来序列化post类型的数据
 
 // create an axios instance
 const service = axios.create({
@@ -22,6 +21,11 @@ service.interceptors.request.use(
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       config.headers['Access-Token'] = getToken()
+    }
+    // 提交都以表单形式
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+    if (config.method === 'post') {
+      config.data = qs.stringify(config.data)
     }
     return config
   },

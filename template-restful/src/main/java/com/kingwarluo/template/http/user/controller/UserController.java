@@ -29,7 +29,7 @@ public class UserController {
 
     @RequestMapping("/login")
     @ResponseBody
-    public Result<String> login(@RequestBody User user) {
+    public Result<String> login(User user) {
         User exist = userService.getUserByName(user.getName());
         if(exist == null) {
             return Result.failBiz("用户不存在");
@@ -48,8 +48,7 @@ public class UserController {
     }
 
     @RequestMapping("/info")
-    public Result getUserByNameAndPassword(HttpServletRequest request) {
-        String token = request.getHeader("Access-Token");
+    public Result getUserByNameAndPassword(String token) {
         String username = JwtUtil.getUsername(token);
         return Result.suc(userService.getUserByName(username));
     }
