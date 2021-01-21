@@ -4,6 +4,8 @@ spring:
     url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
+  lifecycle:
+    timeout-per-shutdown-phase: 30s   # 优雅停机宽限期时间
 
 mybatis:
   mapper-locations: classpath*:mapper/*.xml
@@ -23,4 +25,12 @@ management:
     web:
       base-path: /actuator
       exposure:
-        include: [env, beans]
+        include: '*'    # shutdown 节点默认是不暴露的
+  endpoint:
+    shutdown:
+      enabled: true
+    configprops:
+      enabled: true
+
+server:
+  shutdown: graceful    # 开启优雅停机, 如果不配置是默认IMMEDIATE, 立即停机
