@@ -12,7 +12,15 @@ mybatis:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 shiro:
-  noLoginUrls: /user/login
+  noLoginUrls: /favicon.ico,/user/login,/actuator/*
   cachingEnabled: true
   authenticationCachingEnabled: true
   authenticationCacheName: authenticationCache
+
+# actuator监控配置
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: [env, beans]
