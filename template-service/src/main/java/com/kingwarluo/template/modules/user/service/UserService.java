@@ -1,29 +1,24 @@
+/*
+* Copyright (C), 2021-2025, KingWarLuo
+*/
 package com.kingwarluo.template.modules.user.service;
 
 import com.kingwarluo.template.modules.user.domain.User;
+import com.kingwarluo.template.base.mybatis.service.BaseService;
 
 /**
- * 用户服务
+ *  服务类
  *
  * @author jianhua.luo
- * @date 2020/12/17
+ * @since 2021-01-22
  */
-public interface UserService {
+public interface UserService extends BaseService<User> {
 
     /**
-     * 根据用户名密码获取用户
+     * 根据账号查找用户
      *
      * @author jianhua.luo
-     * @date 2020/12/17
+     * @date 2021/1/22
      */
-    User getUserByNameAndPassword(String name, String password);
-
-    /**
-     * 根据用户名获取用户
-     *
-     * @author jianhua.luo
-     * @date 2020/12/17
-     */
-    User getUserByName(String name);
-
+    User getUserByAccount(String account);
 }

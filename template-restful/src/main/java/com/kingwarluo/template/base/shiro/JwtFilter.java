@@ -79,7 +79,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
-        log.info("JwtFilter-->>>executeLogin-Method:init()");
+        log.info("JwtFilter-->>>executeLogin-Method");
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String token = httpServletRequest.getHeader(HEADER_ACCESS_TOKEN);//Access-Token
         if (token == null) {
@@ -115,7 +115,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
-        log.info("JwtFilter-->>>preHandle-Method:init()");
+        log.info("JwtFilter-->>>preHandle-Method");
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         httpServletResponse.setHeader("Access-control-Allow-Origin", httpServletRequest.getHeader("Origin"));

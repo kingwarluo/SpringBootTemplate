@@ -1,32 +1,26 @@
+/*
+* Copyright (C), 2021-2025, KingWarLuo
+*/
 package com.kingwarluo.template.modules.user.dao;
 
 import com.kingwarluo.template.modules.user.domain.User;
 import org.apache.ibatis.annotations.Mapper;
+import com.kingwarluo.template.base.mybatis.dao.IBaseDao;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * 用户dao
+ *  Dao 接口
  *
  * @author jianhua.luo
- * @date 2020/12/17
+ * @since 2021-01-22
  */
 @Mapper
-public interface UserDao {
+public interface UserDao extends IBaseDao<User>{
 
     /**
-     * 根据用户名密码获取用户
-     *
-     * @author jianhua.luo
-     * @date 2020/12/17
+     * 根据账号查找用户
+     * @param account
+     * @return
      */
-    User getUserByNameAndPassword(@Param("name") String name, @Param("password") String password);
-
-    /**
-     * 根据用户名获取用户
-     *
-     * @author jianhua.luo
-     * @date 2020/12/17
-     */
-    User getUserByName(@Param("name") String name);
-
+    User getUserByAccount(@Param("account") String account);
 }

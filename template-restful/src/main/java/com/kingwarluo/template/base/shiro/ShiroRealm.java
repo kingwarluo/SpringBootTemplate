@@ -51,8 +51,8 @@ public class ShiroRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String tokenStr = (String) token.getPrincipal();
         // jwt 解密
-        String username = JwtUtil.getUsername(tokenStr);
-        User user = userService.getUserByName(username);
+        String account = JwtUtil.getUserAccount(tokenStr);
+        User user = userService.getUserByAccount(account);
         if (user == null) {
             throw new AuthenticationException("用户不存在!");
         }

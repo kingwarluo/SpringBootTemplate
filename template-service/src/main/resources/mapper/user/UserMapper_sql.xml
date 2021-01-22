@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kingwarluo.template.modules.user.dao.UserDao">
+    <sql id="allFieldMap">
+        id as id,
+        account as account,
+        name as name,
+        password as password,
+        salt as salt,
+        sex as sex,
+        mobile as mobile,
+        birthday as birthday,
+        head_image as headImage
+    </sql>
+
+    <select id="getById" parameterType="java.lang.Long" resultType="com.kingwarluo.template.modules.user.domain.User">
+        SELECT <include refid="allFieldMap"/>
+        FROM t_user
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.kingwarluo.template.modules.user.domain.User">
+        insert into t_user
+        (
+        account,
+        name,
+        password,
+        salt,
+        sex,
+        mobile,
+        birthday,
+        head_image
+        )
+        values
+        (
+        #{account},
+        #{name},
+        #{password},
+        #{salt},
+        #{sex},
+        #{mobile},
+        #{birthday},
+        #{headImage}
+        )
+        <selectKey resultType="long" keyProperty="id">
+            select LASt_INSERT_ID() AS id
+        </selectKey>
+    </insert>
+
+    <update id="updateById" parameterType="com.kingwarluo.template.modules.user.domain.User">
+        update
+        t_user
+        set
+        <if test="account != null">
+            account = #{account},
+        </if>
+        <if test="name != null">
+            name = #{name},
+        </if>
+        <if test="password != null">
+            password = #{password},
+        </if>
+        <if test="salt != null">
+            salt = #{salt},
+        </if>
+        <if test="sex != null">
+            sex = #{sex},
+        </if>
+        <if test="mobile != null">
+            mobile = #{mobile},
+        </if>
+        <if test="birthday != null">
+            birthday = #{birthday},
+        </if>
+        <if test="headImage != null">
+            head_image = #{headImage}
+        </if>
+        where id = #{id}
+    </update>
+
+    <select id="getUserByAccount" parameterType="java.util.Map" resultType="com.kingwarluo.template.modules.user.domain.User">
+        select <include refid="allFieldMap" />
+        from t_user
+        where account = #{account}
+    </select>
+
+</mapper>

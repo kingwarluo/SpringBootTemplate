@@ -6,13 +6,11 @@ import com.kingwarluo.template.modules.user.domain.User;
 import com.kingwarluo.template.modules.user.service.UserService;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 用户controller
@@ -30,11 +28,11 @@ public class UserController {
     @RequestMapping("/login")
     @ResponseBody
     public Result<String> login(User user) {
-        User exist = userService.getUserByName(user.getName());
+        User exist = userService.getUserByAccount(user.getAccount());
         if(exist == null) {
             return Result.failBiz("用户不存在");
         }
-        String username = user.getName();
+        String account = user.getAccount();
         String password = user.getPassword();
 
         //我的密码是使用uuid作为盐值加密的，所以这里登陆时候还需要做一次对比
@@ -42,15 +40,15 @@ public class UserController {
         if(!simpleHash.toHex().equals(exist.getPassword())){
             return Result.failBiz("密码不正确");
         }
-        // 生成token TODO 放到redis
-        String token = JwtUtil.sign(username, password);
+        // 生成token
+        String token = JwtUtil.sign(account, password);
         return Result.suc(token);
     }
 
     @RequestMapping("/info")
     public Result getUserByNameAndPassword(String token) {
-        String username = JwtUtil.getUsername(token);
-        return Result.suc(userService.getUserByName(username));
+        String username = JwtUtil.getUserAccount(token);
+        return Result.suc(userService.getUserByAccount(username));
     }
 
     @RequestMapping("/logout")
