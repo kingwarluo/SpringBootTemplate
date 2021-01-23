@@ -39,7 +39,6 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        log.info("JwtFilter-->>>isAccessAllowed-Method:{}", WebUtils.toHttp(request).getRequestURI());
         //如果请求头不存在token,则可能是执行登陆操作或是游客状态访问,直接返回true
         if (isLoginAttempt(request, response)) {
             return true;
@@ -68,6 +67,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         String[] noLoginUrls = shiroProperties.getNoLoginUrls().split(",");
         for (String noLoginUrl : noLoginUrls) {
             if(antPathMatcher.match(noLoginUrl, req.getRequestURI())){
+                log.info("JwtFilter，[{}]请求无需登录", req.getRequestURI());
                 return true;
             }
         }
@@ -79,7 +79,6 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
-        log.info("JwtFilter-->>>executeLogin-Method");
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String token = httpServletRequest.getHeader(HEADER_ACCESS_TOKEN);//Access-Token
         if (token == null) {
@@ -115,7 +114,6 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
-        log.info("JwtFilter-->>>preHandle-Method");
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         httpServletResponse.setHeader("Access-control-Allow-Origin", httpServletRequest.getHeader("Origin"));

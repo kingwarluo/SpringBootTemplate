@@ -5,6 +5,7 @@ const state = {
 
 const mutations = {
   ADD_VISITED_VIEW: (state, view) => {
+    // [].some(条件)用于判断是否存在要添加的view
     if (state.visitedViews.some(v => v.path === view.path)) return
     state.visitedViews.push(
       Object.assign({}, view, {
@@ -59,6 +60,7 @@ const mutations = {
   UPDATE_VISITED_VIEW: (state, view) => {
     for (let v of state.visitedViews) {
       if (v.path === view.path) {
+        // Object.assign 用于对象的合并
         v = Object.assign(v, view)
         break
       }

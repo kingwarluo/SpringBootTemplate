@@ -8,7 +8,7 @@ const menuRouter = {
   redirect: '/menu/list',
   name: 'menuMain',
   meta: {
-    title: 'menu main',
+    title: '菜单',
     icon: 'nested'
   },
   children: [
@@ -16,13 +16,14 @@ const menuRouter = {
       path: 'list',
       component: () => import('@/views/menu/list'),
       name: 'menuList',
-      meta: { title: 'menu list' }
+      meta: { title: '菜单管理' }
     },
     {
       path: 'edit',
       component: () => import('@/views/menu/edit'),
       name: 'menuEdit',
-      meta: { title: 'menu edit' }
+      meta: { title: '编辑菜单' },
+      hidden: true
     }
   ]
 }

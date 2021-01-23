@@ -1,5 +1,5 @@
 <template>
-  <el-container class="app-iframe-container" />
+  <el-container class="app-container" />
 </template>
 
 <script>

@@ -159,6 +159,7 @@ export default {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
+              // $router.push会立即跳转到path指定的路径，query是参数，边成 /redirect?query=otherQuery
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })

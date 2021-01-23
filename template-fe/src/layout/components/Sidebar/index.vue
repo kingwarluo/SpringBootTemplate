@@ -1,5 +1,6 @@
 <template>
   <div :class="{'has-logo':showLogo}">
+    <!-- 显示左侧顶部的logo，在settings.js里配置 -->
     <logo v-if="showLogo" :collapse="isCollapse" />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu

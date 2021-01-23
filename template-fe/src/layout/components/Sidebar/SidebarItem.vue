@@ -1,5 +1,6 @@
 <template>
   <div v-if="!item.hidden">
+    <!-- 判断路由是否只有一个非hidden的子节点 或者叶子节点，展示router-link链接 -->
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
@@ -7,8 +8,9 @@
         </el-menu-item>
       </app-link>
     </template>
-
+    <!-- 有多个子节点展示列表 -->
     <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
+      <!-- slot的意思，将父组件（本组件）的slot='title'的整个节点，替换段子组件<slot name='title'></slot>的内容 -->
       <template slot="title">
         <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
       </template>
@@ -32,7 +34,7 @@ import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
 
 export default {
-  name: 'SidebarItem',
+  name: 'SidebarItem', // 这里引用了自身组件，name属性不能修改成sidebaritem，会导致<sidebar-item />节点找不到，可以是sidebarItem
   components: { Item, AppLink },
   mixins: [FixiOSBug],
   props: {
@@ -88,6 +90,8 @@ export default {
       if (isExternal(this.basePath)) {
         return this.basePath
       }
+      // 达到拼接路径的效果，parent.path + '/' + onlyOneChild.path
+      // console.log(this.basePath, routePath, path.resolve(this.basePath, routePath))
       return path.resolve(this.basePath, routePath)
     }
   }

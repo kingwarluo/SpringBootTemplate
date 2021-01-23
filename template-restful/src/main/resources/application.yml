@@ -8,7 +8,7 @@ spring:
     timeout-per-shutdown-phase: 30s   # 优雅停机宽限期时间
 
 mybatis:
-  mapper-locations: classpath*:mapper/*.xml
+  mapper-locations: classpath*:mapper/**/*.xml
   configuration:
     # 打印sql到控制台
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -13,6 +13,7 @@
         @contextmenu.prevent.native="openMenu(tag,$event)"
       >
         {{ tag.title }}
+        <!-- 是否显示关闭图标 -->
         <span v-if="!isAffix(tag)" class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)" />
       </router-link>
     </scroll-pane>
@@ -49,6 +50,7 @@ export default {
     }
   },
   watch: {
+    // 每次路由有变化，就会执行watch的$route()操作，将路由添加到缓存中
     $route() {
       this.addTags()
       this.moveToCurrentTag()

@@ -41,6 +41,7 @@ const state = {
 
 const mutations = {
   SET_ROUTES: (state, routes) => {
+    // 左侧菜单栏最终读取 state.routes 构建
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes)
   }
