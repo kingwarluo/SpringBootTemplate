@@ -1,9 +1,12 @@
 package com.kingwarluo.template.http.user.controller;
 
+import com.kingwarluo.template.base.shiro.JwtToken;
 import com.kingwarluo.template.base.shiro.JwtUtil;
 import com.kingwarluo.template.base.vo.Result;
 import com.kingwarluo.template.modules.user.domain.User;
 import com.kingwarluo.template.modules.user.service.UserService;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +45,8 @@ public class UserController {
         }
         // 生成token
         String token = JwtUtil.sign(account, password);
+        JwtToken jwtToken = new JwtToken(token);
+        SecurityUtils.getSubject().login(jwtToken);
         return Result.suc(token);
     }
 
@@ -53,6 +58,7 @@ public class UserController {
 
     @RequestMapping("/logout")
     public Result logout(HttpServletRequest request) {
+        SecurityUtils.getSubject().logout();
         return Result.suc(true);
     }
 

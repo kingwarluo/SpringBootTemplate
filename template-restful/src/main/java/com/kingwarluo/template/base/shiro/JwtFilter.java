@@ -1,6 +1,7 @@
 package com.kingwarluo.template.base.shiro;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
@@ -17,6 +18,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class JwtFilter extends BasicHttpAuthenticationFilter {
@@ -28,7 +32,15 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
 
     private AntPathMatcher antPathMatcher = new AntPathMatcher();
 
-    private static final String HEADER_ACCESS_TOKEN = "Access-Token";
+    /**
+     * 本地登出API，用作拦截器判断，无需创建Controller
+     */
+    private static String logoutPath = "/user/logout";
+
+    /**
+     * 本地登入API，用作拦截器判断，无需创建Controller
+     */
+    private static String loginPath = "/user/login";
 
     /**
      * 执行登录认证(判断请求头是否带上token)
@@ -39,91 +51,48 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        //如果请求头不存在token,则可能是执行登陆操作或是游客状态访问,直接返回true
-        if (isLoginAttempt(request, response)) {
-            return true;
-        }
-        //如果存在,则进入executeLogin方法执行登入,检查token 是否正确
-        try {
-            executeLogin(request, response);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new AuthenticationException("Token失效请重新登录");
-        }
+        return hasPermission(request);
     }
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        return false;
+        HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        return handler(httpServletRequest, httpServletResponse);
     }
 
     /**
-     * 判断用户是否是登入,检测headers里是否包含token字段
+     * 判断是否有访问权限（地址或菜单）
+     *
+     * @author jianhua.luo
+     * @date 2021/1/24
      */
-    @Override
-    protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
-        HttpServletRequest req = (HttpServletRequest) request;
-        String[] noLoginUrls = shiroProperties.getNoLoginUrls().split(",");
-        for (String noLoginUrl : noLoginUrls) {
-            if(antPathMatcher.match(noLoginUrl, req.getRequestURI())){
-                log.info("JwtFilter，[{}]请求无需登录", req.getRequestURI());
+    private boolean hasPermission(ServletRequest request) {
+        return false;
+    }
+
+    private boolean handler(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            Subject subject = Objects.requireNonNull(SecurityUtils.getSubject());
+            if(subject.isAuthenticated()) {
                 return true;
+            } else {
+                String[] noLoginUrls = shiroProperties.getNoLoginUrls().split(",");
+                for (String noLoginUrl : noLoginUrls) {
+                    if(antPathMatcher.match(noLoginUrl, request.getRequestURI())){
+                        log.info("JwtFilter，[{}]请求无需登录", request.getRequestURI());
+                        return true;
+                    }
+                }
             }
+        } catch (Exception e) {
+            log.error("SYSTEM ERROR", e);
         }
         return false;
-    }
-
-    /**
-     * 重写AuthenticatingFilter的executeLogin方法丶执行登陆操作
-     */
-    @Override
-    protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        String token = httpServletRequest.getHeader(HEADER_ACCESS_TOKEN);//Access-Token
-        if (token == null) {
-            throw new AuthenticationException();
-        }
-        JwtToken jwtToken = new JwtToken(token);
-        // 提交给realm进行登入,如果错误他会抛出异常并被捕获, 反之则代表登入成功,返回true
-        createSubject(request, response).login(jwtToken);
-        return true;
     }
 
     public void setSecurityManager(SecurityManager securityManager) {
         this.securityManager = securityManager;
     }
 
-    /**
-     * 解决冲突问题
-     * @param request
-     * @param response
-     * @return
-     */
-    protected Subject createSubject(ServletRequest request, ServletResponse response) {
-        Subject subject = ThreadContext.getSubject();
-        if (subject == null || !(subject instanceof WebSubject)) {
-            subject = (new WebSubject.Builder(this.securityManager, request, response)).buildWebSubject();
-            ThreadContext.bind(subject);
-        }
-        return subject;
-    }
-
-    /**
-     * 对跨域提供支持
-     */
-    @Override
-    protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        httpServletResponse.setHeader("Access-control-Allow-Origin", httpServletRequest.getHeader("Origin"));
-        httpServletResponse.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
-        httpServletResponse.setHeader("Access-Control-Allow-Headers", httpServletRequest.getHeader("Access-Control-Request-Headers"));
-        // 跨域时会首先发送一个option请求，这里我们给option请求直接返回正常状态
-        if (httpServletRequest.getMethod().equals(RequestMethod.OPTIONS.name())) {
-            httpServletResponse.setStatus(HttpStatus.OK.value());
-            return false;
-        }
-        return super.preHandle(request, response);
-    }
 }

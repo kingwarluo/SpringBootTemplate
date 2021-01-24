@@ -16,6 +16,7 @@ mybatis:
 
 shiro:
   noLoginUrls: /favicon.ico,/user/login,/actuator/*
+  # cache和session不一样，所以设置cache=false
   cachingEnabled: true
   authenticationCachingEnabled: true
   authenticationCacheName: authenticationCache
