@@ -28,19 +28,11 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     @Autowired
     private ShiroProperties shiroProperties;
 
-    private SecurityManager securityManager;
-
     private AntPathMatcher antPathMatcher = new AntPathMatcher();
 
-    /**
-     * 本地登出API，用作拦截器判断，无需创建Controller
-     */
-    private static String logoutPath = "/user/logout";
-
-    /**
-     * 本地登入API，用作拦截器判断，无需创建Controller
-     */
-    private static String loginPath = "/user/login";
+    public JwtFilter(ShiroProperties shiroProperties) {
+        this.shiroProperties = shiroProperties;
+    }
 
     /**
      * 执行登录认证(判断请求头是否带上token)
@@ -89,10 +81,6 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
             log.error("SYSTEM ERROR", e);
         }
         return false;
-    }
-
-    public void setSecurityManager(SecurityManager securityManager) {
-        this.securityManager = securityManager;
     }
 
 }

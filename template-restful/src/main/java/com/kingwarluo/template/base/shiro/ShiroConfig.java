@@ -102,11 +102,6 @@ public class ShiroConfig {
         return securityManager;
     }
 
-    @Bean
-    public JwtFilter jwtFilter() {
-        return new JwtFilter();
-    }
-
     @Bean("shiroFilter")
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager){
         // 设置 SecurityUtils 的 securityManager
@@ -117,8 +112,7 @@ public class ShiroConfig {
 
         // 添加自己的过滤器并且取名为jwt
         LinkedHashMap<String, Filter> filterMap = new LinkedHashMap<>();
-        JwtFilter jwt = jwtFilter();
-        jwt.setSecurityManager(securityManager);
+        JwtFilter jwt = new JwtFilter(shiroProperties);
         filterMap.put("jwt", jwt);
 
         Map<String, String> filterChainDefinitionMap = new HashMap<>();
