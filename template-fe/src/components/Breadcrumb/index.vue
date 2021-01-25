@@ -33,6 +33,7 @@ export default {
   methods: {
     getBreadcrumb() {
       // only show routes with meta.title
+      // this.$route.matched表示所有匹配到的路由，会放到this.$route.matched中
       let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
       const first = matched[0]
 

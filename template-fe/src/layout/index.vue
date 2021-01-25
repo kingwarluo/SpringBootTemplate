@@ -12,6 +12,7 @@
       </div>
       <!-- 主界面 -->
       <app-main />
+      <!-- 右侧设置按钮 -->
       <right-panel v-if="showSettings">
         <settings />
       </right-panel>

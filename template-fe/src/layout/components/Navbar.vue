@@ -1,9 +1,10 @@
 <template>
   <div class="navbar">
+    <!-- 顶部菜单按钮（显示/隐藏左侧菜单） -->
     <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
+    <!-- 当前页面导航展示 -->
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
-
+    <!-- 顶部右侧 搜索、全屏、字体大小、头像框 -->
     <div class="right-menu">
       <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
@@ -17,7 +18,7 @@
         </el-tooltip>
 
       </template>
-
+      <!-- 头像下拉框 -->
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
