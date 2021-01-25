@@ -1,5 +1,6 @@
 package com.kingwarluo.template.base.shiro;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -43,7 +44,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      */
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
-        return hasPermission(request);
+        return super.isAccessAllowed(request, response, mappedValue) && hasPermission(request);
     }
 
     @Override
@@ -65,17 +66,19 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
 
     private boolean handler(HttpServletRequest request, HttpServletResponse response) {
         try {
+            String uri = request.getRequestURI();
             Subject subject = Objects.requireNonNull(SecurityUtils.getSubject());
             if(subject.isAuthenticated()) {
                 return true;
             } else {
                 String[] noLoginUrls = shiroProperties.getNoLoginUrls().split(",");
                 for (String noLoginUrl : noLoginUrls) {
-                    if(antPathMatcher.match(noLoginUrl, request.getRequestURI())){
-                        log.info("JwtFilter，[{}]请求无需登录", request.getRequestURI());
+                    if(antPathMatcher.match(noLoginUrl, uri)){
+                        log.info("JwtFilter，[{}]请求无需登录", uri);
                         return true;
                     }
                 }
+                onAccessDenied(response);
             }
         } catch (Exception e) {
             log.error("SYSTEM ERROR", e);
@@ -83,4 +86,19 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         return false;
     }
 
+    private void onAccessDenied(HttpServletResponse response) throws Exception {
+        setRes(response, HttpServletResponse.SC_UNAUTHORIZED,
+                401, false, 401);
+    }
+
+    private void setRes(HttpServletResponse response, int status, Object data, Boolean success, int code) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        result.put("code", code);
+        result.put("success", success);
+        result.put("description", success ? "请求成功" : "请求失败");
+        result.put("data", data);
+        response.setContentType("application/json;charset=utf-8");
+        response.setStatus(status);
+        response.getWriter().write(JSON.toJSONString(result));
+    }
 }

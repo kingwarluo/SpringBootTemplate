@@ -43,7 +43,7 @@
            overflowToDisk="false"
            statistics="true">
     </cache>
-    <!-- 并发登陆，管理会话缓存 -->
+    <!-- 并发登陆，管理会话缓存（session缓存） -->
     <cache name="shiro-activeSessionCache" eternal="false"
            maxElementsInMemory="10000"
            overflowToDisk="true"

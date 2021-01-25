@@ -12,7 +12,7 @@ mybatis:
   configuration:
     # 打印sql到控制台
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true
+    map-underscore-to-camel-case: on
 
 shiro:
   noLoginUrls: /favicon.ico,/user/login,/actuator/*
@@ -30,9 +30,9 @@ management:
         include: '*'    # shutdown 节点默认是不暴露的
   endpoint:
     shutdown:
-      enabled: true
+      enabled: on
     configprops:
-      enabled: true
+      enabled: on
 
 server:
   shutdown: graceful    # 开启优雅停机, 如果不配置是默认IMMEDIATE, 立即停机

@@ -61,14 +61,14 @@ public class ShiroConfig {
     public SessionDAO sessionDAO() {
         EnterpriseCacheSessionDAO sessionDAO = new EnterpriseCacheSessionDAO();
         sessionDAO.setSessionIdGenerator((session) -> UUID.randomUUID().toString().replaceAll("-", "").toUpperCase());
-        sessionDAO.setActiveSessionsCacheName("shiro-activeSessionCache");
+        sessionDAO.setActiveSessionsCacheName("shiro-activeSessionCache"); // 可以不用设置，shiro默认就是这个可cacheName
         return sessionDAO;
     }
 
     @Bean
     public Cookie cookieProperty() {
         SimpleCookie cookie = new SimpleCookie();
-        cookie.setName("SESSION_COOKIE_NAME");
+        cookie.setName("BACKEND_COOKIE_NAME");
         cookie.setDomain("localhost");
         cookie.setHttpOnly(false);
         cookie.setMaxAge(365 * 24 * 60 * 60); //cookie 过期时间为1年

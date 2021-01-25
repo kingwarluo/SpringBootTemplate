@@ -30,9 +30,7 @@ service.interceptors.request.use(
     return config
   },
   error => {
-    // do something with request error
-    console.log(error) // for debug
-    return Promise.reject(error)
+    errorHandler(error)
   }
 )
 
@@ -78,14 +76,62 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error) // for debug
+    errorHandler(error)
+  }
+)
+
+/**
+ * 请求错误处理
+ * @param error
+ */
+const errorHandler = function(error, callback) {
+  if (callback && typeof callback === 'function') {
+    callback()
+  }
+  if (error.response) {
+    switch (error.response.status) {
+      case 401: {
+        // 未登录跳转至登录页
+        Message({
+          message: `登录超时，请重新登录`,
+          type: 'error',
+          duration: 5 * 1000
+        })
+        const currentLocation = window.location.href.split('#')[1]
+        const loginUrl = `#/login?redirect=` + encodeURI(currentLocation)
+        if (window !== top) {
+          top.location.href = loginUrl
+        } else {
+          location.href = loginUrl
+        }
+        break
+      }
+      case 403: {
+        // 无权限操作
+        Message({
+          message: `无权访问此资源`,
+          type: 'error',
+          duration: 5 * 1000
+        })
+        return Promise.reject(new Error('无权访问此资源'))
+      }
+      default: {
+        const hasError = error.response.data && error.response.data.msg
+        if (hasError) {
+          return Promise.reject(new Error(error.response.data.msg))
+        }
+        break
+      }
+    }
+    return Promise.reject(error.response)
+  } else {
     Message({
-      message: error.message,
+      message: error && error.message ? error.message : '请稍后重试',
       type: 'error',
       duration: 5 * 1000
     })
     return Promise.reject(error)
   }
-)
+}
 
 export default service

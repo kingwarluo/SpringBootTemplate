@@ -8,6 +8,7 @@ import com.kingwarluo.template.modules.user.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -43,7 +44,9 @@ public class UserController {
         if(!simpleHash.toHex().equals(exist.getPassword())){
             return Result.failBiz("密码不正确");
         }
-        // 生成token
+        // 生成token，这里仅用于将用户名密码加密，提供给realm校验使用
+        // 1、如果是ldap，则token用于给子系统登录使用。ldap目录在跳转到子系统时，会给子系统发放一个token
+        //    子系统在realm的auth认证时，会带上该token去请求登录信息，实现自动登录
         String token = JwtUtil.sign(account, password);
         JwtToken jwtToken = new JwtToken(token);
         SecurityUtils.getSubject().login(jwtToken);
@@ -51,9 +54,9 @@ public class UserController {
     }
 
     @RequestMapping("/info")
-    public Result getUserByNameAndPassword(String token) {
-        String username = JwtUtil.getUserAccount(token);
-        return Result.suc(userService.getUserByAccount(username));
+    public Result getUserByNameAndPassword() {
+        Subject subject = SecurityUtils.getSubject();
+        return Result.suc(subject.getPrincipal());
     }
 
     @RequestMapping("/logout")
