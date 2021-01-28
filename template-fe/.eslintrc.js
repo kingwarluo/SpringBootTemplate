@@ -121,7 +121,6 @@ module.exports = {
     'no-octal-escape': 2,
     'no-path-concat': 2,
     'no-proto': 2,
-    'no-redeclare': 2,
     'no-regex-spaces': 2,
     'no-return-assign': [2, 'except-parens'],
     'no-self-assign': 2,
@@ -142,10 +141,6 @@ module.exports = {
     }],
     'no-unreachable': 2,
     'no-unsafe-finally': 2,
-    'no-unused-vars': [2, {
-      'vars': 'all',
-      'args': 'none'
-    }],
     'no-useless-call': 2,
     'no-useless-computed-key': 2,
     'no-useless-constructor': 2,
